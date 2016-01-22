@@ -1,0 +1,13 @@
+{
+  "name": "GeometricPrimatives",
+  "version": "0.0.1",
+  "description": "Mini assignment 1 - GeometricPrimatives",
+  "author": {
+    "name": "Brooks Mershon",
+    "url": "http://bl.ocks.org/bmershon"
+  },
+  "devDependencies": {
+    "faucet": "0.0",
+    "tape": "4"
+  }
+}
