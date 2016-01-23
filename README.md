@@ -14,6 +14,14 @@ Student: Brooks Mershon
 
 45 min spent on Task 4, reading Wikipedia page, implementing Cramer's rule, writing a few tests.
 
+## Impressions
+
+This is a fun introduction to the material and very manageable in scope. I particularly like the idea of the last two tasks representing a induction on the number of dimensions in the problem. It is possible to reuse code written in Task 4.
+
+I hope to get better at thinking up test cases that really check all edge cases for geometry problems. Here, I was a little lax, but for more complex assignments I intend to use the current testing strategy I've implemented to think through comprehensive test cases. When GUI testing is not available, that's all I've got!
+
+No matter how simple, I believe every assignment should treat itself like it is "serious" production code, because I feel like the end goal of the course should be to produce code that is bulletproof and maintainable for whatever geometry problems people are trying to solve.
+
 ## Testing
 
 In the root directory, install Tape and Faucet for unit testing:
