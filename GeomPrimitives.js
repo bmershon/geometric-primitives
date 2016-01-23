@@ -1,4 +1,13 @@
-//Purpose: The engine behind the 3D primitive operations for Mini Assignment 1
+/**
+ *
+ * MATH 209
+ *
+ * Modified from Chris Tralie's assignment template.
+ * This is the engine behind the 3D primitive operations for Mini Assignment 1
+ *
+ * Implementations by Brooks Mershon
+ *
+ */
 
 // pollyfill: globally defined glm namespace for gl-matrix library
 if(typeof window ===  undefined) {
@@ -72,15 +81,34 @@ function getAboveOrBelow(a, b, c, d) {
 }
 
 
-//Purpose: Given a line segment ab and a line segment cd, compute the intersection
-//If they don't intersect, return null
+// Compute Line segment intersection in 2D using Cramer's Rule
 //Inputs: a (vec3), b (vec3), c (vec3), d (vec3)
 //Returns: intersection (vec3) or null if no intersection
 function getLineSegmentIntersection(a, b, c, d) {
-    //TODO: Fill this in for task 4
-    return null; //This is a dummy for now.  Fill in with the vec3 
-    //representing the intersection if it exists.  Only return null if 
-    //no intersection interior to both segments
+    var ab = vec3.create(),
+        cd = vec3.create();
+
+    vec3.sub(ab, b, a);
+    vec3.sub(cd, d, c);
+
+    var ux = ab[0], uy = ab[1],
+        vx = -cd[0], vy = -cd[1],
+        bx = c[0] - a[0], by = c[1] - a[1];
+
+    var denom = ux*vy - vx*uy;
+    if(denom == 0.0) return null;
+
+    var s = (bx*vy - vx*by)/(denom);
+    var t = (ux*by - bx*uy)/(denom);
+
+    if(s < 0 || s > 1 || t < 0 || t > 1) return null;
+
+    var p = vec3.create();
+    var n = vec3.create();
+    vec3.scale(n, ab, s);
+    vec3.add(p, a, n);
+
+    return p; // a + su
 }
 
 //Purpose: Given three points on a triangle abc, compute the triangle circumcenter

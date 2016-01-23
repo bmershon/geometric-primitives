@@ -37,3 +37,11 @@ tape("Triangle ABC: (0, 0, 0), (0, 0, 0), (0, 0, 0)", function(test) {
   test.inDelta(geom.getTriangleArea(a, b, c), 0.0);
   test.end();
 });
+
+tape("Triangle ABC: (0, -1, 4), (2, 4, 5), (0, 0, 9)", function(test) {
+  var a = vec3.fromValues(0, -1, 4),
+      b = vec3.fromValues(2, 4, 5),
+      c = vec3.fromValues(0, 0, 9);
+  test.inDelta(geom.getTriangleArea(a, b, c).toFixed(5), 13.03840);
+  test.end();
+});

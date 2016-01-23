@@ -9,5 +9,8 @@
   "devDependencies": {
     "faucet": "0.0",
     "tape": "4"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/faucet `find test -name '*-test.js'`"
   }
 }
