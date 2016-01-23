@@ -3,7 +3,6 @@ var tape = require("tape"),
     require("./inDelta.js");
 
 var glm = require("../gl-matrix-min.js");
-vec3 = glm.vec3; //global
 var geom = require("../GeomPrimitives.js");
 
 tape("Triangle ABC: (1, 0, 0), (0, 1, 0), (1, 1, 1)", function(test) {

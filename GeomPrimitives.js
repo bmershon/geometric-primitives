@@ -9,8 +9,11 @@
  *
  */
 
+var glm;
+
 // pollyfill: globally defined glm namespace for gl-matrix library
-if(typeof window ===  undefined) {
+if(typeof window === 'undefined') {
+    glm = require('./gl-matrix-min.js');
     vec3 = glm.vec3;
 }
 
@@ -74,6 +77,7 @@ function getAboveOrBelow(a, b, c, d) {
     ab = vec3.sub(ab, b, a);
     ac = vec3.sub(ac, c, a);
     vec3.cross(norm, ab, ac);
+    if (vec3.length(norm) == 0) return undefined;
     vec3.sub(cd, d, c);
     dist = vec3.dot(norm, projVector(cd, norm));
     if(dist == 0) return 0;
@@ -173,7 +177,7 @@ function getMousePos(canvas, evt) {
     };
 }
 
-// Node.js or browser?
+// Node.js or browser? Expose methods for unit testing in Node environment
 if (typeof window === 'undefined') {
   module.exports = {
     projVector: projVector,
