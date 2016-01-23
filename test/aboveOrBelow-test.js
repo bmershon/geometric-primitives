@@ -1,9 +1,7 @@
 var tape = require("tape"),
     fs = require('fs');
-    require("./inDelta.js");
-
-var glm = require("../gl-matrix-min.js");
-var geom = require("../GeomPrimitives.js");
+    require("./inDelta.js"),
+    geom = require("../GeomPrimitives.js");
 
 tape("Point Above: A(1, 0, 0), B(0, 1, 0), C(0, 0, 0) and D(1, 2, 3)", function(test) {
   var a = vec3.fromValues(1, 0, 0),

@@ -1,9 +1,7 @@
 var tape = require("tape"),
     fs = require('fs');
-    require("./inDelta.js");
-
-var glm = require("../gl-matrix-min.js");
-var geom = require("../GeomPrimitives.js");
+    require("./inDelta.js"),
+    geom = require("../GeomPrimitives.js");
 
 tape("Parallel lines A(0, 0), B(5, 7), C(4, 4), D(9, 11)", function(test) {
   var a = vec3.fromValues(0, 0, 0),
