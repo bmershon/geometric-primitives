@@ -1,8 +1,8 @@
 var tape = require("tape"),
     fs = require('fs');
-    require("./inDelta.js");
+    geom = require("../GeomPrimitives.js");
 
-var geom = require("../GeomPrimitives.js");
+require("./inDelta.js"),
 
 tape("A(0, 0, 0), B(0, 1, 0), C(0, 0, 1) -> π/2", function(test) {
   var a = vec3.fromValues(0, 0, 0),

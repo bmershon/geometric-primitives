@@ -1,9 +1,7 @@
 var tape = require("tape"),
-    fs = require('fs');
-    require("./inDelta.js");
+    geom = require("../GeomPrimitives.js");
 
-var glm = require("../gl-matrix-min.js");
-var geom = require("../GeomPrimitives.js");
+require("./inDelta.js"); // add functionality
 
 tape("Triangle ABC: (1, 0, 0), (0, 1, 0), (1, 1, 1)", function(test) {
   var a = vec3.fromValues(1, 0, 0),
