@@ -10,9 +10,11 @@ Student: Brooks Mershon
 
 ## Development
 
-2 hours spent on Task 1-3, **spent primarily on figuring out how to test problems like these without a GUI**.
+2 hours spent on Task 1-3: **spent primarily on figuring out how to test problems like these without a GUI**.
 
-45 min spent on Task 4, reading Wikipedia page, implementing Cramer's rule, writing a few tests.
+45 min spent on Task 4: reading Wikipedia page, implementing Cramer's rule, writing a few tests.
+
+20 min spent on Task 5: mostly chasing a bug caused by a typo.
 
 ## Impressions
 
