@@ -9,13 +9,13 @@
  *
  */
 
-var glm;
+// var glm;
 
-// pollyfill: globally defined glm namespace for gl-matrix library
-if(typeof window === 'undefined') {
-    glm = require('./gl-matrix-min.js');
-    vec3 = glm.vec3;
-}
+// // pollyfill: globally defined glm namespace for gl-matrix library
+// if(typeof window === 'undefined') {
+//     glm = require('./gl-matrix-min.js');
+//     vec3 = glm.vec3;
+// }
 
 //Purpose: Project vector u onto vector v using the glMatrix library
 //Inputs: u (vec3), v (vec3)
@@ -84,20 +84,36 @@ function getAboveOrBelow(a, b, c, d) {
     else return vec3.dot(norm, d) > 0 ? 1 : -1;
 }
 
-
 // Compute Line segment intersection in 2D using Cramer's Rule
 //Inputs: a (vec3), b (vec3), c (vec3), d (vec3)
 //Returns: intersection (vec3) or null if no intersection
-function getLineSegmentIntersection(a, b, c, d) {
+function getLineSegmentIntersection(a, b, c, d, extend) {
     var ab = vec3.create(),
         cd = vec3.create();
 
     vec3.sub(ab, b, a);
     vec3.sub(cd, d, c);
 
-    var ux = ab[0], uy = ab[1],
-        vx = -cd[0], vy = -cd[1],
-        bx = c[0] - a[0], by = c[1] - a[1];
+    var pair = solveParametricIntersection(a, ab, c, cd);
+    s = pair[0];
+    t = pair[1];
+
+    // check solution bounds
+    if(s < 0 || s > 1 || t < 0 || t > 1) return null;
+
+    var p = vec3.create();
+    var n = vec3.create();
+    vec3.scale(n, ab, s);
+    vec3.add(p, a, n);
+
+    return p; // a + su
+}
+
+// point a extending in direction u, point b extending in direction v
+function solveParametricIntersection(a, u, b, v) {
+    var ux = u[0], uy = u[1],
+        vx = -v[0], vy = -v[1],
+        bx = b[0] - a[0], by = b[1] - a[1];
 
     var denom = ux*vy - vx*uy;
     if(denom == 0.0) return null;
@@ -105,7 +121,19 @@ function getLineSegmentIntersection(a, b, c, d) {
     var s = (bx*vy - vx*by)/(denom);
     var t = (ux*by - bx*uy)/(denom);
 
-    if(s < 0 || s > 1 || t < 0 || t > 1) return null;
+    return [s, t];
+}
+
+function getLineIntersection(a, b, c, d) {
+    var ab = vec3.create(),
+        cd = vec3.create();
+
+    vec3.sub(ab, b, a);
+    vec3.sub(cd, d, c);
+
+    var pair = solveParametricIntersection(a, ab, c, cd);
+    s = pair[0];
+    t = pair[1];
 
     var p = vec3.create();
     var n = vec3.create();
@@ -121,11 +149,29 @@ function getLineSegmentIntersection(a, b, c, d) {
 //Inputs: a (vec3), b (vec3), c (vec3)
 //Returns: On object of the form {circumcenter: vec3, R: float (radius)}
 function getTriangleCircumcenter(a, b, c) {
-    //TODO: Fill this in for task 5
-    return {Circumcenter:vec3.fromValues(0, 0, 0), Radius:0.0};  //This is a dummy
-    //for now that shows how to return a JSON object from a function.  Replace
-    //vec3.fromValues(0, 0, 0) with the true circumcenter and 0.0 with the 
-    //true radius
+
+    var ab = vec3.create(), ac = vec3.create(),
+        u = vec3.create(), v = vec3.create(), // normals
+        e = vec3.create(), f = vec3.create(), // midpoints
+        g = vec3.create(), h = vec3.create(), // constructed endpoints
+        _a = vec3.create(), _b = vec3.create(), _c = vec3.create();
+        
+    vec3.sub(ab, b, a);
+    vec3.sub(ac, c, a);
+    vec3.normalize(u, vec3.fromValues(-ab[1], ab[0], 0)); // rotate 90 degrees counter-clockwise
+    vec3.normalize(v, vec3.fromValues(ac[1], -ac[0], 0)); // rotate 90 degrees clockwise
+    vec3.scale(_a, a, 0.5);
+    vec3.scale(_b, b, 0.5);
+    vec3.scale(_c, c, 0.5);
+    vec3.add(e, _a, _b); // convex combination of a and b
+    vec3.add(g, _a, _c); // convex combinaton of a and c
+    vec3.add(f, e, u); // endpoint f of ef
+    vec3.add(h, g, v); // endpoint h of gh
+
+    var p = getLineIntersection(e, f, g, h);
+    var r = vec3.distance(b, p);
+
+    return {Circumcenter: p, Radius: r}; 
 }
 
 //Purpose: Given four points on a 3D tetrahedron, compute the circumsphere
@@ -178,18 +224,18 @@ function getMousePos(canvas, evt) {
 }
 
 // Node.js or browser? Expose methods for unit testing in Node environment
-if (typeof window === 'undefined') {
-  module.exports = {
-    projVector: projVector,
-    projPerpVector: projPerpVector,
-    getAngle: getAngle,
-    getAngle: getAngle,
-    getTriangleArea: getTriangleArea,
-    getAboveOrBelow: getAboveOrBelow,
-    getLineSegmentIntersection: getLineSegmentIntersection,
-    getTriangleCircumcenter: getTriangleCircumcenter,
-    getTetrahedronCircumsphere: getTetrahedronCircumsphere,
-    getAxesEqual: getAxesEqual,
-    getMousePos: getMousePos
-  };
-}
+// if (typeof window === 'undefined') {
+//   module.exports = {
+//     projVector: projVector,
+//     projPerpVector: projPerpVector,
+//     getAngle: getAngle,
+//     getAngle: getAngle,
+//     getTriangleArea: getTriangleArea,
+//     getAboveOrBelow: getAboveOrBelow,
+//     getLineSegmentIntersection: getLineSegmentIntersection,
+//     getTriangleCircumcenter: getTriangleCircumcenter,
+//     getTetrahedronCircumsphere: getTetrahedronCircumsphere,
+//     getAxesEqual: getAxesEqual,
+//     getMousePos: getMousePos
+//   };
+// }
