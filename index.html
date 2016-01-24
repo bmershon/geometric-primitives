@@ -14,93 +14,98 @@
 <script>
 
 "use strict";
-function update() {
+var data = [];
 
-    var data = [];
+var color = d3.scale.category10();
 
-    var color = d3.scale.category10();
-
-    var a = vec3.fromValues(1, 0, 0),
-        b = vec3.fromValues(0, 0.5, 0),
-        c = vec3.fromValues(0, 0, 1),
-        d = vec3.fromValues(0.5, 0, 0);
+var a = vec3.fromValues(1, 0, 0),
+    b = vec3.fromValues(0, 2, 0),
+    c = vec3.fromValues(0, 1, 5),
+    d = vec3.fromValues(0, 6, 0);
 
 
-    var letter = ['a', 'b', 'c', 'd'];
-    var vertices = [a, b, c, d];
-    var edges = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
-    var faces = [[0, 1, 2], [0, 2, 3], [1, 2, 3], [0, 3, 1]];
+var letter = ['a', 'b', 'c', 'd'];
+var vertices = [a, b, c, d];
+var edges = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
+var faces = [[0, 1, 2], [0, 2, 3], [1, 2, 3], [0, 3, 1]];
+var normals = [];
 
-    // tetrahedron vertices
-    for(var i = 0; i < vertices.length; i++){
-      let v = vertices[i];
-      data.push({
-        x: [v[0]], y: [v[1]], z: [v[2]],
-        mode: 'markers+lines', line: {color: '#ffffff', width: 10},
-        type: 'scatter3d', name: letter[i],
-        marker: {color: color(i), size: 10, symbol: 'circle'}
-      });
-    }
-
-    // face calculations
-    for(var i = 0; i < faces.length; i++) {
-      let face = faces[i];
-      let points = face.map(function(d) { return vertices[d];});
-      let c = getTriangleCircumcenter.apply(null, points).Circumcenter;
-      data.push({
-        x: [c[0]], y: [c[1]], z: [c[2]],
-        mode: 'markers+lines', line: {color: '#ffffff', width: 10},
-        type: 'scatter3d', name: face.map(function(d) {return letter[d]}).join(''),
-        marker: {color: "#000", size: 5, symbol: 'circle'}
-      });
-      let n = vec3.create();
-      let f = vec3.create();
-      let e1 = vec3.create();
-      let e2 = vec3.create();
-      vec3.sub(e1, points[0], points[2]);
-      vec3.sub(e2, points[0], points[1]);
-      vec3.cross(n, e1, e2);
-      vec3.normalize(n, n);
-      vec3.add(f, c, n);
-      data.push({
-        x: [c[0], f[0]], y: [c[1], f[1]], z: [c[2], f[2]],
-        mode: 'lines', line: {color: '#555555', width: 5},
-        type: 'scatter3d', name: "normal",
-      });
-    }
-
-    for (var i = 0; i < edges.length; i++) {
-      let edge = edges[i];
-      let points = edge.map(function(d) { return vertices[d];});
-      data.push({
-        x: [points[0][0], points[1][0]], y: [points[0][1], points[1][1]], z: [points[0][2], points[1][2]],
-        mode: 'lines', line: {color: '#555555', width: 2},
-        type: 'scatter3d', name: "edge" + letter[edge[0]] + letter[edge[1]],
-      });
-    }
-
-    var ball = getTetrahedronCircumsphere.apply(null, vertices);
-    var center = ball.Circumcenter;
-
-    data.push({
-      x: [v[0]], y: [v[1]], z: [v[2]],
-      mode: 'markers+lines', line: {color: '#fff', width: 10},
-      type: 'scatter3d', name: "circumcenter",
-      marker: {color: "#F1BBE1", size: 15, symbol: 'circle'}
-    });
-
-
-    var axes = getAxesEqual([a, b, c]);
-    data = data.concat([axes.x, axes.y, axes.z]);
-    // var data = [$a, $b, $c, $d, $ab, $ac, $abcCenter,$abdCenter, axes.x, axes.y, axes.z];
-    var layout = {
-      autosize: false, width: 900, height: 500,
-      margin: { l: 0, r: 0, b: 0, t: 65 }
-    };
-    Plotly.newPlot('viz', data, layout);    
+// draw tetrahedron vertices
+for(var i = 0; i < vertices.length; i++){
+  let v = vertices[i];
+  data.push({
+    x: [v[0]], y: [v[1]], z: [v[2]],
+    mode: 'markers+lines', line: {color: '#ffffff', width: 10},
+    type: 'scatter3d', name: letter[i],
+    marker: {color: color(i), size: 10, symbol: 'circle'}
+  });
 }
 
-update();
+// draw faces, normals
+for(var i = 0; i < faces.length; i++) {
+  let face = faces[i];
+  let points = face.map(function(d) { return vertices[d];});
+  let c = getTriangleCircumcenter.apply(null, points).Circumcenter;
+  data.push({
+    x: [c[0]], y: [c[1]], z: [c[2]],
+    mode: 'markers+lines', line: {color: '#ffffff', width: 10},
+    type: 'scatter3d', name: face.map(function(d) {return letter[d]}).join(''),
+    marker: {color: "#000", size: 5, symbol: 'circle'}
+  });
+  let n = vec3.create();
+  let f = vec3.create();
+  let g = vec3.create();
+  let e1 = vec3.create();
+  let e2 = vec3.create();
+  vec3.sub(e1, points[0], points[2]);
+  vec3.sub(e2, points[0], points[1]);
+  vec3.cross(n, e1, e2);
+  vec3.normalize(n, n);
+  vec3.add(f, c, n);
+  vec3.sub(g, c, n);
+  normals.push([c, f]); // [point, point]
+
+  data.push({
+    x: [c[0], f[0]], y: [c[1], f[1]], z: [c[2], f[2]],
+    mode: 'lines', line: {color: '#555555', width: 5},
+    type: 'scatter3d', name: "normal counterclockwise",
+  });
+
+  data.push({
+    x: [c[0], g[0]], y: [c[1], g[1]], z: [c[2], g[2]],
+    mode: 'lines', line: {color: '#555555', width: 5},
+    type: 'scatter3d', name: "normal clockwise",
+  });
+}
+
+// draw edges
+for (var i = 0; i < edges.length; i++) {
+  let edge = edges[i];
+  let points = edge.map(function(d) { return vertices[d];});
+  data.push({
+    x: [points[0][0], points[1][0]], y: [points[0][1], points[1][1]], z: [points[0][2], points[1][2]],
+    mode: 'lines', line: {color: '#555555', width: 5},
+    type: 'scatter3d', name: "edge" + letter[edge[0]] + letter[edge[1]],
+  });
+}
+
+var ball = getTetrahedronCircumsphere.apply(null, vertices);
+var center = ball.Circumcenter;
+
+data.push({
+  x: [center[0]], y: [center[1]], z: [center[2]],
+  mode: 'markers+lines', line: {color: '#fff', width: 10},
+  type: 'scatter3d', name: "circumsphere center",
+  marker: {color: "#777", size: 10, symbol: 'circle'}
+});
+
+var axes = getAxesEqual([a, b, c]);
+data = data.concat([axes.x, axes.y, axes.z]);
+var layout = {
+  autosize: false, width: 900, height: 500,
+  margin: { l: 0, r: 0, b: 0, t: 65 }
+};
+var plot = Plotly.newPlot('viz', data, layout);    
 
 </script>
 

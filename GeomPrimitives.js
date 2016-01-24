@@ -16,6 +16,8 @@ if(typeof window === 'undefined') {
     global.vec3 = glm.vec3;
 }
 
+var epsilon = 1e-3;
+
 //Purpose: Project vector u onto vector v using the glMatrix library
 //Inputs: u (vec3), v (vec3)
 //Returns: projv (vec3), the projection of u onto v
@@ -109,7 +111,7 @@ function getLineSegmentIntersection(a, b, c, d) {
 // point a extending in direction u, point b extending in direction v
 // returns null if lines are parallel or skew
 function solveParametricIntersection(a, u, b, v) {
-    var ux = u[0], uy = u[1], uz = -u[2],
+    var ux = u[0], uy = u[1], uz = u[2],
         vx = -v[0], vy = -v[1], vz = -v[2],
         bx = b[0] - a[0], by = b[1] - a[1], bz = b[2] - a[2],
         ab = vec3.create(), ba = vec3.create(),
@@ -124,7 +126,7 @@ function solveParametricIntersection(a, u, b, v) {
     vec3.cross(n2, v, ba);
     vec3.cross(diff, n1, n2);
 
-    if (vec3.length(diff) !== 0.0) return null;
+    if (!(inDelta(vec3.length(diff), 0.0))) return null;
 
     if(ux*vy - vx*uy !== 0) { // solve for x and y coordinates
         let denom = ux*vy - vx*uy;
@@ -218,8 +220,8 @@ function getTetrahedronCircumsphere(a, b, c, d) {
     vec3.cross(n1, ab, ac);
     vec3.cross(n2, bc, bd);
     
-    var e = getTriangleCircumcenter(a, b, c);
-    var g = getTriangleCircumcenter(b, c, d);
+    var e = getTriangleCircumcenter(a, b, c).Circumcenter;
+    var g = getTriangleCircumcenter(b, c, d).Circumcenter;
 
     vec3.add(f, e, n1);
     vec3.add(h, g, n2);
@@ -267,6 +269,10 @@ function getMousePos(canvas, evt) {
         X: evt.clientX - rect.left,
         Y: evt.clientY - rect.top
     };
+}
+
+function inDelta(actual, expected) {
+    return actual < expected + epsilon && actual > expected - epsilon;
 }
 
 //Node.js or browser? Expose methods for unit testing in Node environment
