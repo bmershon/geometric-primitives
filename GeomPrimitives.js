@@ -9,13 +9,11 @@
  *
  */
 
-// var glm;
-
-// // pollyfill: globally defined glm namespace for gl-matrix library
-// if(typeof window === 'undefined') {
-//     glm = require('./gl-matrix-min.js');
-//     vec3 = glm.vec3;
-// }
+// pollyfill: globally defined glm namespace for gl-matrix library
+if(typeof window === 'undefined') {
+    var glm = require('./gl-matrix-min.js');
+    vec3 = glm.vec3;
+}
 
 //Purpose: Project vector u onto vector v using the glMatrix library
 //Inputs: u (vec3), v (vec3)
@@ -84,36 +82,45 @@ function getAboveOrBelow(a, b, c, d) {
     else return vec3.dot(norm, d) > 0 ? 1 : -1;
 }
 
-// Compute Line segment intersection in 2D using Cramer's Rule
 //Inputs: a (vec3), b (vec3), c (vec3), d (vec3)
 //Returns: intersection (vec3) or null if no intersection
-function getLineSegmentIntersection(a, b, c, d, extend) {
-    var ab = vec3.create(),
-        cd = vec3.create();
+function getLineSegmentIntersection(a, b, c, d) {
+    var ab = vec3.create(), cd = vec3.create();
 
     vec3.sub(ab, b, a);
     vec3.sub(cd, d, c);
 
-    var pair = solveParametricIntersection(a, ab, c, cd);
-    s = pair[0];
-    t = pair[1];
+    var s = solveParametricIntersection(a, ab, c, cd);
+    if (!s) return null; 
 
     // check solution bounds
-    if(s < 0 || s > 1 || t < 0 || t > 1) return null;
+    if(s[0] < 0 || s[0] > 1 || s[1] < 0 || s[1] > 1) return null;
 
     var p = vec3.create();
     var n = vec3.create();
-    vec3.scale(n, ab, s);
+    vec3.scale(n, ab, s[0]);
     vec3.add(p, a, n);
 
     return p; // a + su
 }
 
 // point a extending in direction u, point b extending in direction v
+// returns null if lines are skew or parallel
 function solveParametricIntersection(a, u, b, v) {
     var ux = u[0], uy = u[1],
         vx = -v[0], vy = -v[1],
-        bx = b[0] - a[0], by = b[1] - a[1];
+        bx = b[0] - a[0], by = b[1] - a[1],
+        ab = vec3.create(), ba = vec3.create(),
+        n1 = vec3.create(), n2 = vec3.create(),
+        diff = vec3.create();
+
+    vec3.sub(ab, b, a);
+    vec3.sub(ba, a, b);
+    vec3.cross(n1, u, ab);
+    vec3.cross(n2, v, ba);
+    vec3.cross(diff, n1, n2);
+
+    if (vec3.length(diff) !== 0.0) return null;
 
     var denom = ux*vy - vx*uy;
     if(denom == 0.0) return null;
@@ -125,22 +132,20 @@ function solveParametricIntersection(a, u, b, v) {
 }
 
 function getLineIntersection(a, b, c, d) {
-    var ab = vec3.create(),
-        cd = vec3.create();
+    var ab = vec3.create(), cd = vec3.create();
 
     vec3.sub(ab, b, a);
     vec3.sub(cd, d, c);
 
-    var pair = solveParametricIntersection(a, ab, c, cd);
-    s = pair[0];
-    t = pair[1];
+    var s = solveParametricIntersection(a, ab, c, cd);
+    if (!s) return null; 
 
     var p = vec3.create();
     var n = vec3.create();
-    vec3.scale(n, ab, s);
+    vec3.scale(n, ab, s[0]);
     vec3.add(p, a, n);
 
-    return p; // a + su
+    return p;
 }
 
 //Purpose: Given three points on a triangle abc, compute the triangle circumcenter
@@ -223,19 +228,20 @@ function getMousePos(canvas, evt) {
     };
 }
 
-// Node.js or browser? Expose methods for unit testing in Node environment
-// if (typeof window === 'undefined') {
-//   module.exports = {
-//     projVector: projVector,
-//     projPerpVector: projPerpVector,
-//     getAngle: getAngle,
-//     getAngle: getAngle,
-//     getTriangleArea: getTriangleArea,
-//     getAboveOrBelow: getAboveOrBelow,
-//     getLineSegmentIntersection: getLineSegmentIntersection,
-//     getTriangleCircumcenter: getTriangleCircumcenter,
-//     getTetrahedronCircumsphere: getTetrahedronCircumsphere,
-//     getAxesEqual: getAxesEqual,
-//     getMousePos: getMousePos
-//   };
-// }
+//Node.js or browser? Expose methods for unit testing in Node environment
+if (typeof window === 'undefined') {
+  module.exports = {
+    projVector: projVector,
+    projPerpVector: projPerpVector,
+    getAngle: getAngle,
+    getAngle: getAngle,
+    getTriangleArea: getTriangleArea,
+    getAboveOrBelow: getAboveOrBelow,
+    getLineSegmentIntersection: getLineSegmentIntersection,
+    getLineIntersection: getLineIntersection,
+    getTriangleCircumcenter: getTriangleCircumcenter,
+    getTetrahedronCircumsphere: getTetrahedronCircumsphere,
+    getAxesEqual: getAxesEqual,
+    getMousePos: getMousePos
+  };
+}
