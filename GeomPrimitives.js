@@ -160,40 +160,38 @@ function getLineIntersection(a, b, c, d) {
     return p;
 }
 
+// https://en.wikipedia.org/wiki/Circumscribed_circle
 //Purpose: Given three points on a triangle abc, compute the triangle circumcenter
 //by intersecting two perpendicular bisectors from two different sides, and
 //compute the radius of the circumcircle
 //Inputs: a (vec3), b (vec3), c (vec3)
 //Returns: On object of the form {circumcenter: vec3, R: float (radius)}
-function getTriangleCircumcenter(a, b, c) {
+function getTriangleCircumcenter(A, B, C) {
 
-    var ab = vec3.create(), ac = vec3.create(), ca = vec3.create(),
-        u = vec3.create(), v = vec3.create(), // normals
-        e = vec3.create(), f = vec3.create(), // midpoints
-        g = vec3.create(), h = vec3.create(), // constructed endpoints
-        _a = vec3.create(), _b = vec3.create(), _c = vec3.create(),
-        n = vec3.create();
-        
-    vec3.sub(ab, b, a);
-    vec3.sub(ac, c, a);
-    vec3.sub(ca, a, c);
+    var a = vec3.create(0), b = vec3.create(),
+        _a_2,
+        _b_2,
+        _axb_2,
+        axb = vec3.create(),
+        t1 = vec3.create(), t2 = vec3.create(), t3 = vec3.create(),
+        p = vec3.create();
 
-    vec3.cross(n, ab, ac);
-    vec3.cross(u, n, ab);
-    vec3.cross(v, n, ca);
-    vec3.normalize(u, u); 
-    vec3.normalize(v, v);
-    
-    vec3.scale(_a, a, 0.5);
-    vec3.scale(_b, b, 0.5);
-    vec3.scale(_c, c, 0.5);
-    vec3.add(e, _a, _b); // convex combination of a and b
-    vec3.add(g, _a, _c); // convex combinaton of a and c
-    vec3.add(f, e, u); // endpoint f of ef
-    vec3.add(h, g, v); // endpoint h of gh
+    vec3.sub(a, A, C);
+    vec3.sub(b, B, C);
+    vec3.cross(axb, a, b);
+    _a_2 = vec3.length(a) * vec3.length(a);
+    _b_2 = vec3.length(b) * vec3.length(b);
+    _axb_2 = vec3.length(axb) * vec3.length(axb);
 
-    var p = getLineIntersection(e, f, g, h);
-    var r = vec3.distance(b, p);
+    vec3.scale(t1, b, _a_2);
+    vec3.scale(t2, a, _b_2);
+    vec3.sub(t3, t1, t2);
+    vec3.cross(p, t3, axb);
+
+    vec3.scale(p, p, 1/(2*_axb_2));
+
+    vec3.add(p, p, C);
+    var r = vec3.dist(C, p);
 
     return {Circumcenter: p, Radius: r}; 
 }
