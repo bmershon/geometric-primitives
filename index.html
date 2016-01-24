@@ -20,19 +20,15 @@ function update() {
 
     var color = d3.scale.category10();
 
-    var a = vec3.create(),
-        b = vec3.create(),
-        c = vec3.create(),
-        d = vec3.create();
-
-    vec3.random(a, 1);
-    vec3.random(b, 1);
-    vec3.random(c, 1);
-    vec3.random(d, 1);
+    var a = vec3.fromValues(1, 0, 0),
+        b = vec3.fromValues(0, 0.5, 0),
+        c = vec3.fromValues(0, 0, 1),
+        d = vec3.fromValues(0.5, 0, 0);
 
 
     var letter = ['a', 'b', 'c', 'd'];
     var vertices = [a, b, c, d];
+    var edges = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
     var faces = [[0, 1, 2], [0, 2, 3], [1, 2, 3], [0, 3, 1]];
 
     // tetrahedron vertices
@@ -68,10 +64,31 @@ function update() {
       vec3.add(f, c, n);
       data.push({
         x: [c[0], f[0]], y: [c[1], f[1]], z: [c[2], f[2]],
-        mode: 'lines', line: {color: '#555555', width: 10},
+        mode: 'lines', line: {color: '#555555', width: 5},
         type: 'scatter3d', name: "normal",
       });
     }
+
+    for (var i = 0; i < edges.length; i++) {
+      let edge = edges[i];
+      let points = edge.map(function(d) { return vertices[d];});
+      data.push({
+        x: [points[0][0], points[1][0]], y: [points[0][1], points[1][1]], z: [points[0][2], points[1][2]],
+        mode: 'lines', line: {color: '#555555', width: 2},
+        type: 'scatter3d', name: "edge" + letter[edge[0]] + letter[edge[1]],
+      });
+    }
+
+    var ball = getTetrahedronCircumsphere.apply(null, vertices);
+    var center = ball.Circumcenter;
+
+    data.push({
+      x: [v[0]], y: [v[1]], z: [v[2]],
+      mode: 'markers+lines', line: {color: '#fff', width: 10},
+      type: 'scatter3d', name: "circumcenter",
+      marker: {color: "#F1BBE1", size: 15, symbol: 'circle'}
+    });
+
 
     var axes = getAxesEqual([a, b, c]);
     data = data.concat([axes.x, axes.y, axes.z]);

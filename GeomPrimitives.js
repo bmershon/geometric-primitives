@@ -72,13 +72,15 @@ function getAboveOrBelow(a, b, c, d) {
     var norm = vec3.create(),
         ab  = vec3.create(),
         ac  = vec3.create(),
-        cd  = vec3.create();
+        cd  = vec3.create(),
+        dist;
+
     ab = vec3.sub(ab, b, a);
     ac = vec3.sub(ac, c, a);
     vec3.cross(norm, ab, ac);
     if (vec3.length(norm) == 0) return undefined;
     vec3.sub(cd, d, c);
-    var dist = vec3.dot(norm, projVector(cd, norm));
+    dist = vec3.dot(norm, projVector(cd, norm));
     if(dist == 0) return 0;
     else return vec3.dot(norm, d) > 0 ? 1 : -1;
 }
@@ -86,7 +88,8 @@ function getAboveOrBelow(a, b, c, d) {
 //Inputs: a (vec3), b (vec3), c (vec3), d (vec3)
 //Returns: intersection (vec3) or null if no intersection
 function getLineSegmentIntersection(a, b, c, d) {
-    var ab = vec3.create(), cd = vec3.create();
+    var ab = vec3.create(), cd = vec3.create(),
+        p = vec3.create(), n = vec3.create();
 
     vec3.sub(ab, b, a);
     vec3.sub(cd, d, c);
@@ -97,8 +100,6 @@ function getLineSegmentIntersection(a, b, c, d) {
     // check solution bounds
     if(s[0] < 0 || s[0] > 1 || s[1] < 0 || s[1] > 1) return null;
 
-    var p = vec3.create();
-    var n = vec3.create();
     vec3.scale(n, ab, s[0]);
     vec3.add(p, a, n);
 
@@ -113,7 +114,8 @@ function solveParametricIntersection(a, u, b, v) {
         bx = b[0] - a[0], by = b[1] - a[1], bz = b[2] - a[2],
         ab = vec3.create(), ba = vec3.create(),
         n1 = vec3.create(), n2 = vec3.create(),
-        diff = vec3.create();
+        diff = vec3.create(),
+        s, t;
 
     // two normals coincide if lines line in same plane
     vec3.sub(ab, b, a);
@@ -126,34 +128,34 @@ function solveParametricIntersection(a, u, b, v) {
 
     if(ux*vy - vx*uy !== 0) { // solve for x and y coordinates
         let denom = ux*vy - vx*uy;
-        var s = (bx*vy - vx*by)/(denom);
-        var t = (ux*by - bx*uy)/(denom);
+        s = (bx*vy - vx*by)/(denom);
+        t = (ux*by - bx*uy)/(denom);
         return [s, t];
     } else if (ux*vz - vx*uz !== 0) { // solve for x and z coordinates
         let denom = ux*vz - vx*uz;
-        var s = (bx*vz - vx*bz)/(denom);
-        var t = (ux*bz - bx*uz)/(denom);
+        s = (bx*vz - vx*bz)/(denom);
+        t = (ux*bz - bx*uz)/(denom);
         return [s, t];
     } else if (uy*vz - vy*uz !== 0) { // solve for y and z coordinates
         let denom = uy*vz - vy*uz;
-        var s = (by*vz - vy*bz)/(denom);
-        var t = (uy*bz - by*uz)/(denom);
+        s = (by*vz - vy*bz)/(denom);
+        t = (uy*bz - by*uz)/(denom);
         return [s, t];
     } else 
         return null; // lines are parallel or coincide
 }
 
 function getLineIntersection(a, b, c, d) {
-    var ab = vec3.create(), cd = vec3.create();
+    var ab = vec3.create(), cd = vec3.create(),
+        p = vec3.create(), n = vec3.create(),
+        s;
 
     vec3.sub(ab, b, a);
     vec3.sub(cd, d, c);
 
-    var s = solveParametricIntersection(a, ab, c, cd);
+    s = solveParametricIntersection(a, ab, c, cd);
     if (!s) return null; 
 
-    var p = vec3.create();
-    var n = vec3.create();
     vec3.scale(n, ab, s[0]);
     vec3.add(p, a, n);
 
@@ -167,14 +169,14 @@ function getLineIntersection(a, b, c, d) {
 //Inputs: a (vec3), b (vec3), c (vec3)
 //Returns: On object of the form {circumcenter: vec3, R: float (radius)}
 function getTriangleCircumcenter(A, B, C) {
-
     var a = vec3.create(0), b = vec3.create(),
         _a_2,
         _b_2,
         _axb_2,
         axb = vec3.create(),
         t1 = vec3.create(), t2 = vec3.create(), t3 = vec3.create(),
-        p = vec3.create();
+        p = vec3.create(),
+        r;
 
     vec3.sub(a, A, C);
     vec3.sub(b, B, C);
@@ -191,7 +193,7 @@ function getTriangleCircumcenter(A, B, C) {
     vec3.scale(p, p, 1/(2*_axb_2));
 
     vec3.add(p, p, C);
-    var r = vec3.dist(C, p);
+    r = vec3.dist(C, p);
 
     return {Circumcenter: p, Radius: r}; 
 }
@@ -202,8 +204,30 @@ function getTriangleCircumcenter(A, B, C) {
 //Inputs: a (vec3), b (vec3), c (vec3), d (vec3)
 //Returns: On object of the form {circumcenter: vec3, R: float (radius)}
 function getTetrahedronCircumsphere(a, b, c, d) {
-    //EXTRA CREDIT
-    return {Circumcenter:vec3.fromValues(0, 0, 0), Radius:0.0};
+    var n1 = vec3.create(), n2 = vec3.create(),
+        f = vec3.create(), h = vec3.create(),
+        ab = vec3.create(), ac = vec3.create(),
+        bc = vec3.create(), bd = vec3.create(),
+        p, r;
+
+    vec3.sub(ab, b, a);
+    vec3.sub(ac, c, a);
+    vec3.sub(bc, c, b);
+    vec3.sub(bd, d, b);
+
+    vec3.cross(n1, ab, ac);
+    vec3.cross(n2, bc, bd);
+    
+    var e = getTriangleCircumcenter(a, b, c);
+    var g = getTriangleCircumcenter(b, c, d);
+
+    vec3.add(f, e, n1);
+    vec3.add(h, g, n2);
+
+    p = getLineIntersection(e, f, g, h);
+    r = vec3.dist(a, p);
+
+    return {Circumcenter: p, Radius: r};
 }
 
 ///////////////////////////////////////////////////////////////////
