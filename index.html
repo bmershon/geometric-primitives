@@ -1,0 +1,107 @@
+<!--Programmer: Chris Tralie!-->
+<!--Purpose: Front end point chooser / debugger for angle function!-->
+<html>
+<head>
+<!-- This is how you include external scripts in Javascript !-->
+<script src = "GeomPrimitives.js"></script>
+<script src= "gl-matrix-min.js"></script>
+<script src = "plotly.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<body>
+
+<div id = "viz"></div>
+
+<script>
+
+"use strict";
+function update() {
+
+    var data = [];
+
+    var color = d3.scale.category10();
+
+    var ax = 1,
+        ay = 0,
+        az = 0,
+        a = vec3.fromValues(ax, ay, az);
+    
+    var bx = 0,
+        by = 1,
+        bz = 0,
+        b = vec3.fromValues(bx, by, bz);
+
+    var cx = 0,
+        cy = 0,
+        cz = 1,
+        c = vec3.fromValues(cx, cy, cz);
+
+    var dx = 0,
+        dy = 0,
+        dz = 0,
+        d = vec3.fromValues(dx, dy, dz);
+
+    var letter = ['a', 'b', 'c', 'd'];
+    var vertices = [a, b, c, d];
+    var faces = [[0, 1, 2], [0, 1, 3], [1, 2, 3], [0, 2, 3]];
+
+    for(var i = 0; i < vertices.length; i++){
+      let v = vertices[i];
+      data.push({
+        x: [v[0]], y: [v[1]], z: [v[2]],
+        mode: 'markers+lines', line: {color: '#ffffff', width: 10},
+        type: 'scatter3d', name: letter[i],
+        marker: {color: color(i), size: 10, symbol: 'circle'}
+      });
+    }
+
+    for(var i = 0; i < faces.length; i++) {
+      let face = faces[i];
+      let points = face.map(function(d) { return vertices[d];});
+      let c = getTriangleCircumcenter.apply(null, points).Circumcenter;
+      data.push({
+        x: [c[0]], y: [c[1]], z: [c[2]],
+        mode: 'markers+lines', line: {color: '#ffffff', width: 10},
+        type: 'scatter3d', name: face.join(''),
+        marker: {color: "#000", size: 5, symbol: 'circle'}
+      });
+    }
+
+    // var $ab = { x: [ax, bx], y: [ay, by], z: [az, bz],
+    //   mode: 'lines', line: {color: '#000000', width: 10},
+    //   type: 'scatter3d', name: 'ab',
+    // };
+    // var $ac = { x: [ax, cx], y: [ay, cy], z: [az, cz],
+    //   mode: 'lines', line: {color: '#555555', width: 10},
+    //   type: 'scatter3d', name: 'ac',
+    // };
+    // var $abcCenter = { x: [abcBall.Circumcenter[0]], y: [abcBall.Circumcenter[1]], z: [abcBall.Circumcenter[2]],
+    //   mode: 'markers+lines', line: {color: '#ffffff', width: 10},
+    //   type: 'scatter3d', name:'d',
+    //   marker: {color: '#000', size: 5, symbol: 'circle'}
+    // };
+    // var $abdCenter = { x: [abdBall.Circumcenter[0]], y: [abdBall.Circumcenter[1]], z: [abdBall.Circumcenter[2]],
+    //   mode: 'markers+lines', line: {color: '#ffffff', width: 10},
+    //   type: 'scatter3d', name:'d',
+    //   marker: {color: '#000', size: 5, symbol: 'circle'}
+    // };
+    // var $bcdCenter = { x: [abdBall.Circumcenter[0]], y: [abdBall.Circumcenter[1]], z: [abdBall.Circumcenter[2]],
+    //   mode: 'markers+lines', line: {color: '#ffffff', width: 10},
+    //   type: 'scatter3d', name:'d',
+    //   marker: {color: '#000', size: 5, symbol: 'circle'}
+    // };
+    var axes = getAxesEqual([a, b, c]);
+    data = data.concat([axes.x, axes.y, axes.z]);
+    // var data = [$a, $b, $c, $d, $ab, $ac, $abcCenter,$abdCenter, axes.x, axes.y, axes.z];
+    var layout = {
+      autosize: false, width: 900, height: 500,
+      margin: { l: 0, r: 0, b: 0, t: 65 }
+    };
+    Plotly.newPlot('viz', data, layout);    
+}
+
+update();
+
+</script>
+
+</body>
+</html>

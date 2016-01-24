@@ -167,16 +167,23 @@ function getLineIntersection(a, b, c, d) {
 //Returns: On object of the form {circumcenter: vec3, R: float (radius)}
 function getTriangleCircumcenter(a, b, c) {
 
-    var ab = vec3.create(), ac = vec3.create(),
+    var ab = vec3.create(), ac = vec3.create(), ca = vec3.create(),
         u = vec3.create(), v = vec3.create(), // normals
         e = vec3.create(), f = vec3.create(), // midpoints
         g = vec3.create(), h = vec3.create(), // constructed endpoints
-        _a = vec3.create(), _b = vec3.create(), _c = vec3.create();
+        _a = vec3.create(), _b = vec3.create(), _c = vec3.create(),
+        n = vec3.create();
         
     vec3.sub(ab, b, a);
     vec3.sub(ac, c, a);
-    vec3.normalize(u, vec3.fromValues(-ab[1], ab[0], 0)); // rotate 90 degrees counter-clockwise
-    vec3.normalize(v, vec3.fromValues(ac[1], -ac[0], 0)); // rotate 90 degrees clockwise
+    vec3.sub(ca, a, c);
+
+    vec3.cross(n, ab, ac);
+    vec3.cross(u, n, ab);
+    vec3.cross(v, n, ca);
+    vec3.normalize(u, u); 
+    vec3.normalize(v, v);
+    
     vec3.scale(_a, a, 0.5);
     vec3.scale(_b, b, 0.5);
     vec3.scale(_c, c, 0.5);
@@ -212,8 +219,8 @@ function getTetrahedronCircumsphere(a, b, c, d) {
 //This is the way I hack the axes to be equal
 function getAxesEqual(vs) {
     //Determine the axis ranges
-    minval = 0;
-    maxval = 0;
+    var minval = 0;
+    var maxval = 0;
     for (var i = 0; i < vs.length; i++) {
         for (var j = 0; j < 3; j++) {
             if (vs[i][j] < minval){ minval = vs[i][j]; }
