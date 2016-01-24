@@ -75,7 +75,6 @@ function callComputeAngle() {
     //Log the vec3 objects to the console to make sure everything was parsed correctly
     console.log("Computing angle between " + vec3.str(b) + " and " + vec3.str(c) + " with respect to " + vec3.str(a));
     
-    //Perform the projection
     var angle = getAngle(a, b, c);
     //Output result in radians up to two decimal places
     document.getElementById("angleAnswer").value = angle.toFixed(2) + " radians";

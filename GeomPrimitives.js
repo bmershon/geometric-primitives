@@ -9,10 +9,11 @@
  *
  */
 
+"use strict";
 // pollyfill: globally defined glm namespace for gl-matrix library
 if(typeof window === 'undefined') {
     var glm = require('./gl-matrix-min.js');
-    vec3 = glm.vec3;
+    global.vec3 = glm.vec3;
 }
 
 //Purpose: Project vector u onto vector v using the glMatrix library
@@ -77,7 +78,7 @@ function getAboveOrBelow(a, b, c, d) {
     vec3.cross(norm, ab, ac);
     if (vec3.length(norm) == 0) return undefined;
     vec3.sub(cd, d, c);
-    dist = vec3.dot(norm, projVector(cd, norm));
+    var dist = vec3.dot(norm, projVector(cd, norm));
     if(dist == 0) return 0;
     else return vec3.dot(norm, d) > 0 ? 1 : -1;
 }
@@ -105,15 +106,16 @@ function getLineSegmentIntersection(a, b, c, d) {
 }
 
 // point a extending in direction u, point b extending in direction v
-// returns null if lines are skew or parallel
+// returns null if lines are parallel or skew
 function solveParametricIntersection(a, u, b, v) {
-    var ux = u[0], uy = u[1],
-        vx = -v[0], vy = -v[1],
-        bx = b[0] - a[0], by = b[1] - a[1],
+    var ux = u[0], uy = u[1], uz = -u[2],
+        vx = -v[0], vy = -v[1], vz = -v[2],
+        bx = b[0] - a[0], by = b[1] - a[1], bz = b[2] - a[2],
         ab = vec3.create(), ba = vec3.create(),
         n1 = vec3.create(), n2 = vec3.create(),
         diff = vec3.create();
 
+    // two normals coincide if lines line in same plane
     vec3.sub(ab, b, a);
     vec3.sub(ba, a, b);
     vec3.cross(n1, u, ab);
@@ -122,13 +124,23 @@ function solveParametricIntersection(a, u, b, v) {
 
     if (vec3.length(diff) !== 0.0) return null;
 
-    var denom = ux*vy - vx*uy;
-    if(denom == 0.0) return null;
-
-    var s = (bx*vy - vx*by)/(denom);
-    var t = (ux*by - bx*uy)/(denom);
-
-    return [s, t];
+    if(ux*vy - vx*uy !== 0) { // solve for x and y coordinates
+        let denom = ux*vy - vx*uy;
+        var s = (bx*vy - vx*by)/(denom);
+        var t = (ux*by - bx*uy)/(denom);
+        return [s, t];
+    } else if (ux*vz - vx*uz !== 0) { // solve for x and z coordinates
+        let denom = ux*vz - vx*uz;
+        var s = (bx*vz - vx*bz)/(denom);
+        var t = (ux*bz - bx*uz)/(denom);
+        return [s, t];
+    } else if (uy*vz - vy*uz !== 0) { // solve for y and z coordinates
+        let denom = uy*vz - vy*uz;
+        var s = (by*vz - vy*bz)/(denom);
+        var t = (uy*bz - by*uz)/(denom);
+        return [s, t];
+    } else 
+        return null; // lines are parallel or coincide
 }
 
 function getLineIntersection(a, b, c, d) {
