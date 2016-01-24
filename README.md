@@ -16,13 +16,11 @@ Student: Brooks Mershon
 
 20 min spent on Task 5: mostly chasing a bug caused by a typo.
 
+4 hours spent on Extra Credit.
+
 ## Impressions
 
-This is a fun introduction to the material and very manageable in scope. I particularly like the idea of the last two tasks representing a induction on the number of dimensions in the problem. It is possible to reuse code written in Task 4.
-
-I hope to get better at thinking up test cases that really check all edge cases for geometry problems. Here, I was a little lax, but for more complex assignments I intend to use the current testing strategy I've implemented to think through comprehensive test cases. When GUI testing is not available, that's all I've got!
-
-No matter how simple, I believe every assignment should treat itself like it is "serious" production code, because I feel like the end goal of the course should be to produce code that is bulletproof and maintainable for whatever geometry problems people are trying to solve.
+This is a fun introduction to the material and very manageable in scope. I particularly like the idea of the last two tasks representing a induction on the number of dimensions in the problem. It is possible to reuse code written in Task 4. The extra credit caused me to fix bugs in previous sections which did not cause problems until we start doing computations in 3d.
 
 ## Testing
 

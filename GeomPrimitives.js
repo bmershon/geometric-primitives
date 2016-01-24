@@ -5,7 +5,7 @@
  * Modified from Chris Tralie's assignment template.
  * This is the engine behind the 3D primitive operations for Mini Assignment 1
  *
- * Implementations by Brooks Mershon
+ * Geometry implementations by Brooks Mershon, 2016
  *
  */
 
@@ -164,7 +164,6 @@ function getLineIntersection(a, b, c, d) {
     return p;
 }
 
-// https://en.wikipedia.org/wiki/Circumscribed_circle
 //Purpose: Given three points on a triangle abc, compute the triangle circumcenter
 //by intersecting two perpendicular bisectors from two different sides, and
 //compute the radius of the circumcircle
