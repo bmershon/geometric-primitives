@@ -124,6 +124,9 @@ function solveParametricIntersection(a, u, b, v) {
     vec3.sub(ba, a, b);
     vec3.cross(n1, u, ab);
     vec3.cross(n2, v, ba);
+    vec3.normalize(n1, n1);
+    vec3.normalize(n2, n2);
+
     vec3.cross(diff, n1, n2);
 
     if (!(inDelta(vec3.length(diff), 0.0))) return null;

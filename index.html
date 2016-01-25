@@ -28,7 +28,7 @@ var color = d3.scale.category10();
 var a = vec3.fromValues(X(), 0, 0),
     b = vec3.fromValues(0, Y(), 0),
     c = vec3.fromValues(0, 0, Z()),
-    d = vec3.fromValues(0, 0, 0);
+    d = vec3.fromValues(X(), Y(), Z());
 
 var letter = ['a', 'b', 'c', 'd'];
 var vertices = [a, b, c, d];
@@ -96,22 +96,40 @@ for (var i = 0; i < edges.length; i++) {
 }
 
 var ball = getTetrahedronCircumsphere.apply(null, vertices);
+var radius = ball.Radius;
 var center = ball.Circumcenter;
+
+var sampled = d3.range(5000).map(function(d) {
+  var out = vec3.create();
+  vec3.random(out, radius);
+  vec3.add(out, center, out);
+  return out;
+});
+
+data.push({
+  x: sampled.map(function(d) {return d[0]}),
+  y: sampled.map(function(d) {return d[1]}),
+  z: sampled.map(function(d) {return d[2]}),
+  mode: 'markers',
+  type: 'scatter3d', name: 'sphere',
+  marker: {color: "#aaa", size: 1, symbol: 'circle'}
+});
 
 data.push({
   x: [center[0]], y: [center[1]], z: [center[2]],
-  mode: 'markers+lines', line: {color: '#fff', width: 10},
+  mode: 'markers+lines', line: {color: "#fff", width: 0},
   type: 'scatter3d', name: "circumsphere center",
-  marker: {color: "#777", size: 10, symbol: 'circle'}
+  marker: {color: "red", size: 5, symbol: 'circle'}
 });
 
 var axes = getAxesEqual([a, b, c]);
 data = data.concat([axes.x, axes.y, axes.z]);
 var layout = {
-  autosize: false, width: 900, height: 500,
+  autosize: false, width: 900, height: 900,
   margin: { l: 0, r: 0, b: 0, t: 65 }
 };
-Plotly.newPlot('viz', data, layout);    
+Plotly.newPlot('viz', data, layout);  
+
 
 </script>
 
