@@ -16,7 +16,7 @@ if(typeof window === 'undefined') {
     global.vec3 = glm.vec3;
 }
 
-var epsilon = 1e-3;
+var epsilon = 1e-6;
 
 //Purpose: Project vector u onto vector v using the glMatrix library
 //Inputs: u (vec3), v (vec3)

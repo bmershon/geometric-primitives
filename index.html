@@ -1,7 +1,7 @@
 <html>
 <head>
 <!-- This is how you include external scripts in Javascript !-->
-<script src = "GeomPrimitives.js"></script>
+<script src = "build/gl-geom.js"></script>
 <script src= "gl-matrix-min.js"></script>
 <script src = "plotly.min.js"></script>
 <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -11,17 +11,15 @@
 
 <script>
 
-/**
- *
- * @author Brooks Mershon, 2016
- *
- */
 "use strict";
+var gl = {};
+gl.geom = gl_geom;
+
 var data = [];
 
-var X = d3.random.normal(1, 0.1);
-var Y = d3.random.normal(1, 0.1);
-var Z = d3.random.normal(1, 0.2);
+var X = d3.random.normal(1, 0.5);
+var Y = d3.random.normal(1, 0.5);
+var Z = d3.random.normal(1, 0.5);
 
 var color = d3.scale.category10();
 
@@ -51,12 +49,12 @@ for(var i = 0; i < vertices.length; i++){
 for(var i = 0; i < faces.length; i++) {
   let face = faces[i];
   let points = face.map(function(d) { return vertices[d];});
-  let c = getTriangleCircumcenter.apply(null, points).Circumcenter;
+  let c = gl.geom.getTriangleCircumcenter.apply(null, points).Circumcenter;
   data.push({
     x: [c[0]], y: [c[1]], z: [c[2]],
     mode: 'markers+lines', line: {color: '#ffffff', width: 10},
-    type: 'scatter3d', name: face.map(function(d) {return letter[d]}).join(''),
-    marker: {color: "#000", size: 5, symbol: 'circle'}
+    type: 'scatter3d', name: face.map(function(d) {return letter[d]}).join('') + " circumcenter",
+    marker: {color: "#aaa", size: 5, symbol: 'circle'}
   });
   let n = vec3.create();
   let f = vec3.create();
@@ -74,13 +72,13 @@ for(var i = 0; i < faces.length; i++) {
   data.push({
     x: [c[0], f[0]], y: [c[1], f[1]], z: [c[2], f[2]],
     mode: 'lines', line: {color: '#EB9394', width: 5},
-    type: 'scatter3d', name: "normal counterclockwise",
+    type: 'scatter3d', name: face.map(function(d) {return letter[d]}).join('') + " normal clockwise",
   });
 
   data.push({
     x: [c[0], g[0]], y: [c[1], g[1]], z: [c[2], g[2]],
     mode: 'lines', line: {color: '#CAB3DE', width: 5},
-    type: 'scatter3d', name: "normal clockwise",
+    type: 'scatter3d', name: face.map(function(d) {return letter[d]}).join('') + " normal counter-clockwise",
   });
 }
 
@@ -95,7 +93,7 @@ for (var i = 0; i < edges.length; i++) {
   });
 }
 
-var ball = getTetrahedronCircumsphere.apply(null, vertices);
+var ball = gl.geom.getTetrahedronCircumsphere.apply(null, vertices);
 var radius = ball.Radius;
 var center = ball.Circumcenter;
 
@@ -112,14 +110,14 @@ data.push({
   z: sampled.map(function(d) {return d[2]}),
   mode: 'markers',
   type: 'scatter3d', name: 'sphere',
-  marker: {color: "#aaa", size: 1, symbol: 'circle'}
+  marker: {color: "#00AEEF", size: 1, symbol: 'circle'}
 });
 
 data.push({
   x: [center[0]], y: [center[1]], z: [center[2]],
   mode: 'markers+lines', line: {color: "#fff", width: 0},
   type: 'scatter3d', name: "circumsphere center",
-  marker: {color: "red", size: 5, symbol: 'circle'}
+  marker: {color: "#000", size: 5, symbol: 'circle'}
 });
 
 var axes = getAxesEqual([a, b, c]);
@@ -128,9 +126,38 @@ var layout = {
   autosize: false, width: 900, height: 900,
   margin: { l: 0, r: 0, b: 0, t: 65 }
 };
+
+function getAxesEqual(vs) {
+  //Determine the axis ranges
+  var minval = 0;
+  var maxval = 0;
+  for (var i = 0; i < vs.length; i++) {
+    for (var j = 0; j < 3; j++) {
+      if (vs[i][j] < minval){ minval = vs[i][j]; }
+      if (vs[i][j] > maxval){ maxval = vs[i][j]; }
+    }
+  }
+  return {
+  x:{ x: [minval, maxval], y: [0, 0], z: [0, 0],
+    mode: 'lines', line: {color: '#000000', width: 1}, type: 'scatter3d', name:'xaxis'
+  },
+  y:{ x: [0, 0], y: [minval, maxval], z: [0, 0],
+    mode: 'lines', line: {color: '#000000', width: 1}, type: 'scatter3d', name:'yaxis'
+  },
+  z:{ x: [0, 0], y: [0, 0], z: [minval, maxval],
+    mode: 'lines', line: {color: '#000000', width: 1}, type: 'scatter3d', name:'zaxis'
+  }};
+}
+
+function getMousePos(canvas, evt) {
+  var rect = canvas.getBoundingClientRect();
+  return {
+    X: evt.clientX - rect.left,
+    Y: evt.clientY - rect.top
+  };
+}
+
 Plotly.newPlot('viz', data, layout);  
-
-
 </script>
 
 </body>
