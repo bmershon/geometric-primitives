@@ -1,5 +1,5 @@
 var tape = require("tape"),
-    geom = require("../GeomPrimitives.js");
+    geom = require("../build/gl-geom.js");
 
 require("./inDelta.js"); // add functionality
 
