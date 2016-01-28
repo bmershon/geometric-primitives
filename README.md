@@ -31,7 +31,7 @@ The extra credit caused me to fix bugs in previous sections which did not cause 
 In the root directory, install all required dependencies as specified in *package.json* by running:
 
 ```bash
-npm intall
+npm install
 ```
 
 To run all tests and build the *GeomPrimitives file from source*:
@@ -52,4 +52,4 @@ for (var property in gl_geom) {
 }
 ```
 
-This build pattern closely adheres to a module pattern propsed by Mike Bostock for plugins to the D3 datavisualizaiton library.
+This build pattern closely adheres to a module pattern propsed by Mike Bostock for plugins to the D3 data visualizaiton library.
