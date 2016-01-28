@@ -1,5 +1,3 @@
-var epsilon = 1e-6;
-
 //Purpose: To compute the angle between the vectors ab and ac
 //Inputs: a (vec3), b (vec3), c (vec3)
 //Returns: angle (radians - float)
