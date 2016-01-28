@@ -1,5 +1,8 @@
 var tape = require("tape"),
+    gl_matrix = require("../gl-matrix-min.js"),
     geom = require("../build/gl-geom.js");
+
+global.vec3 = gl_matrix.vec3;
 
 require("./inDelta.js"); // add functionality
 

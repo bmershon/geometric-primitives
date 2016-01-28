@@ -81,14 +81,24 @@ export function getAboveOrBelow(a, b, c, d) {
 
 //Inputs: a (vec3), b (vec3), c (vec3), d (vec3)
 //Returns: intersection (vec3) or null if no intersection
-export function getLineSegmentIntersection(a, b, c, d) {
+export function getLineSegmentIntersection(a, b, c, d, force) {
+  force = force || false;
+
   var ab = vec3.create(), cd = vec3.create(),
-      p = vec3.create(), n = vec3.create();
+      u = vec3.create(), v = vec3.create(),
+      p = vec3.create(), n = vec3.create(),
+      s;
 
   vec3.sub(ab, b, a);
   vec3.sub(cd, d, c);
+  vec3.normalize(u, ab);
+  vec3.normalize(v, cd);
+  vec3.cross(n, u, v);
 
-  var s = solveParametricIntersection(a, ab, c, cd);
+  if (!force && !inDelta(vec3.length(n), 0)) return null;
+
+  s = solveParametricIntersection(a, ab, c, cd);
+
   if (!s) return null; 
 
   // check solution bounds
@@ -102,56 +112,54 @@ export function getLineSegmentIntersection(a, b, c, d) {
 
 // point a extending in direction u, point b extending in direction v
 // returns null if lines are parallel or skew
-export function solveParametricIntersection(a, u, b, v) {
+function solveParametricIntersection(a, u, b, v) {
   var ux = u[0], uy = u[1], uz = u[2],
       vx = -v[0], vy = -v[1], vz = -v[2],
       bx = b[0] - a[0], by = b[1] - a[1], bz = b[2] - a[2],
-      ab = vec3.create(), ba = vec3.create(),
-      n1 = vec3.create(), n2 = vec3.create(),
-      diff = vec3.create(),
       s, t;
 
-  // Least-Squares Matrix
-  var a1 = ux*ux + uy*uy * uz*uz,
-      a2 = vx*ux + vy*uy + vz*uz,
-      b1 = vx*ux + vy*uy + vz*uz,
-      b2 = vx*vx + vy*vy + vz*vz;
+  var denom;
 
-  var c1 = ux*bx + uy*by + uz*bz,
-      c2 = vx*bx + vy*by + vz*bz;
-
-  // two normals coincide if lines lie in same plane
-  vec3.sub(ab, b, a);
-  vec3.sub(ba, a, b);
-  vec3.cross(n1, u, ab);
-  vec3.cross(n2, v, ba);
-  vec3.normalize(n1, n1);
-  vec3.normalize(n2, n2);
-
-  vec3.cross(diff, n1, n2);
-
-  console.debug(diff);
-
-  if (!(inDelta(vec3.length(diff), 0.0))) return null;
-
-  var denom = a1*b2 - b1*a2;
-  s = (c1*b2 - b1*c2)/(denom);
-  t = (a1*c2 - c1*a2)/(denom);
-  return [s, t];
+  if(ux*vy - vx*uy !== 0) { // solve for x and y coordinates
+      denom = ux*vy - vx*uy;
+      s = (bx*vy - vx*by)/(denom);
+      t = (ux*by - bx*uy)/(denom);
+      return [s, t];
+  } else if (ux*vz - vx*uz !== 0) { // solve for x and z coordinates
+      denom = ux*vz - vx*uz;
+      s = (bx*vz - vx*bz)/(denom);
+      t = (ux*bz - bx*uz)/(denom);
+      return [s, t];
+  } else if (uy*vz - vy*uz !== 0) { // solve for y and z coordinates
+      denom = uy*vz - vy*uz;
+      s = (by*vz - vy*bz)/(denom);
+      t = (uy*bz - by*uz)/(denom);
+      return [s, t];
+  } else 
+      return null; // lines are parallel or coincide
 }
 
-export function getLineIntersection(a, b, c, d) {
+export function getLineIntersection(a, b, c, d, force) {
+  force = force || false;
+
   var ab = vec3.create(), cd = vec3.create(),
+      u = vec3.create(), v = vec3.create(),
       p = vec3.create(), n = vec3.create(),
       s;
 
   vec3.sub(ab, b, a);
   vec3.sub(cd, d, c);
+  vec3.normalize(u, ab);
+  vec3.normalize(v, cd);
+  vec3.cross(n, u, v);
+
+  if (!force && !inDelta(vec3.length(n), 0)) return null;
 
   s = solveParametricIntersection(a, ab, c, cd);
+
   if (!s) return null; 
 
-  vec3.scale(n, ab, s[1]);
+  vec3.scale(n, ab, s[0]);
   vec3.add(p, a, n);
 
   return p;
@@ -218,7 +226,7 @@ export function getTetrahedronCircumsphere(a, b, c, d) {
   vec3.add(f, e, n1);
   vec3.add(h, g, n2);
 
-  p = getLineIntersection(e, f, g, h);
+  p = getLineIntersection(e, f, g, h, true);
   r = vec3.dist(a, p);
 
   return {Circumcenter: p, Radius: r};

@@ -5,9 +5,9 @@
 <html>
 <head>
 <!-- This is how you include external scripts in Javascript !-->
-<script src = "GeomPrimitives.js"></script>
-<script src= "gl-matrix-min.js"></script>
-<script src = "plotly.min.js"></script>
+<script src = "../GeomPrimitives.js"></script>
+<script src= "../gl-matrix-min.js"></script>
+<script src = "../plotly.min.js"></script>
 <body>
 
 <h2><a name = "angle">Task 5: Triangle Circumscribed Circle (15 points)</a></h2>
@@ -140,6 +140,14 @@ function selectPoint(evt) {
 canvas.addEventListener("mousedown", selectPoint);
 canvas.addEventListener("touchstart", selectPoint); //Works on mobile devices!
 repaint();
+
+function getMousePos(canvas, evt) {
+  var rect = canvas.getBoundingClientRect();
+  return {
+    X: evt.clientX - rect.left,
+    Y: evt.clientY - rect.top
+  };
+}
 
 </script>
 

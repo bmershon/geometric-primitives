@@ -1,5 +1,8 @@
 var tape = require("tape"),
-    geom = require("../GeomPrimitives.js");
+    gl_matrix = require("../gl-matrix-min.js"),
+    geom = require("../build/gl-geom.js");
+
+global.vec3 = gl_matrix.vec3;
 
 require("./inDelta.js"); // add functionality
 
@@ -74,4 +77,3 @@ tape("Degenerate triangle: A(1, 0, 0), B(0, 0, 1), C(0, 0, 1) and D(1, 1, 1)", f
   test.equal(geom.getAboveOrBelow(a, b, c, d), undefined, "degenerate case, triangle has no area");
   test.end();
 });
-

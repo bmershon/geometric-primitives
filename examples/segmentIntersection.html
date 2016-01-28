@@ -5,9 +5,9 @@
 <html>
 <head>
 <!-- This is how you include external scripts in Javascript !-->
-<script src= "gl-matrix-min.js"></script>
-<script src = "build/gl-geom.js"></script>
-<script src = "plotly.min.js"></script>
+<script src = "../GeomPrimitives.js"></script>
+<script src= "../gl-matrix-min.js"></script>
+<script src = "../plotly.min.js"></script>
 <body>
 
 <h2><a name = "angle">Task 4: Line Segment Intersection (10 points)</a></h2>
@@ -133,7 +133,7 @@ function selectPoint(evt) {
 	    }	
 	}
 	if (!(a === null) && !(b === null) && !(c === null) && !(d === null)) {
-	    intersection = getLineSegmentIntersection(a, b, c, d);
+	    intersection = getLineSegmentIntersection(a, b, c, d, true);
 	    if (intersection === null) {
 	        document.getElementById('Intersection').innerHTML = "null";
 	    }
@@ -142,28 +142,6 @@ function selectPoint(evt) {
 	    }
 	}
 	repaint();
-}
-
-function getAxesEqual(vs) {
-  //Determine the axis ranges
-  var minval = 0;
-  var maxval = 0;
-  for (var i = 0; i < vs.length; i++) {
-    for (var j = 0; j < 3; j++) {
-      if (vs[i][j] < minval){ minval = vs[i][j]; }
-      if (vs[i][j] > maxval){ maxval = vs[i][j]; }
-    }
-  }
-  return {
-  x:{ x: [minval, maxval], y: [0, 0], z: [0, 0],
-    mode: 'lines', line: {color: '#000000', width: 1}, type: 'scatter3d', name:'xaxis'
-  },
-  y:{ x: [0, 0], y: [minval, maxval], z: [0, 0],
-    mode: 'lines', line: {color: '#000000', width: 1}, type: 'scatter3d', name:'yaxis'
-  },
-  z:{ x: [0, 0], y: [0, 0], z: [minval, maxval],
-    mode: 'lines', line: {color: '#000000', width: 1}, type: 'scatter3d', name:'zaxis'
-  }};
 }
 
 function getMousePos(canvas, evt) {
