@@ -1,5 +1,5 @@
 var tape = require("tape"),
-    gl_matrix = require("../gl-matrix-min.js"),
+    gl_matrix = require("../lib/gl-matrix-min.js"),
     geom = require("../build/gl-geom.js");
 
 global.vec3 = gl_matrix.vec3;
