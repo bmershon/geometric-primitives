@@ -113,6 +113,28 @@ function callComputeAngle() {
     Plotly.newPlot('angleVis', data, layout);    
 }
 
+function getAxesEqual(vs) {
+  //Determine the axis ranges
+  var minval = 0;
+  var maxval = 0;
+  for (var i = 0; i < vs.length; i++) {
+    for (var j = 0; j < 3; j++) {
+      if (vs[i][j] < minval){ minval = vs[i][j]; }
+      if (vs[i][j] > maxval){ maxval = vs[i][j]; }
+    }
+  }
+  return {
+  x:{ x: [minval, maxval], y: [0, 0], z: [0, 0],
+    mode: 'lines', line: {color: '#000000', width: 1}, type: 'scatter3d', name:'xaxis'
+  },
+  y:{ x: [0, 0], y: [minval, maxval], z: [0, 0],
+    mode: 'lines', line: {color: '#000000', width: 1}, type: 'scatter3d', name:'yaxis'
+  },
+  z:{ x: [0, 0], y: [0, 0], z: [minval, maxval],
+    mode: 'lines', line: {color: '#000000', width: 1}, type: 'scatter3d', name:'zaxis'
+  }};
+}
+
 </script>
 
 
