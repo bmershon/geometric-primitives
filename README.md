@@ -10,6 +10,10 @@ Instructor: Chris Tralie
 
 Student: Brooks Mershon
 
+## Quickstart
+
+Open *index.html* to see the circumsphere of a tetrahedron.
+
 ## Development
 
 2 hours spent on Task 1-3: **Spent primarily on figuring out how to test problems like these without a GUI**.
