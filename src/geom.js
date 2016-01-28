@@ -8,8 +8,6 @@
  * Geometry implementations by Brooks Mershon, 2016
  *
  */
-
-"use strict";
 var epsilon = 1e-6;
 
 //Purpose: Project vector u onto vector v using the glMatrix library
@@ -113,7 +111,16 @@ export function solveParametricIntersection(a, u, b, v) {
       diff = vec3.create(),
       s, t;
 
-  // two normals coincide if lines line in same plane
+  // Least-Squares Matrix
+  var a1 = ux*ux + uy*uy * uz*uz,
+      a2 = vx*ux + vy*uy + vz*uz,
+      b1 = vx*ux + vy*uy + vz*uz,
+      b2 = vx*vx + vy*vy + vz*vz;
+
+  var c1 = ux*bx + uy*by + uz*bz,
+      c2 = vx*bx + vy*by + vz*bz;
+
+  // two normals coincide if lines lie in same plane
   vec3.sub(ab, b, a);
   vec3.sub(ba, a, b);
   vec3.cross(n1, u, ab);
@@ -123,27 +130,14 @@ export function solveParametricIntersection(a, u, b, v) {
 
   vec3.cross(diff, n1, n2);
 
+  console.debug(diff);
+
   if (!(inDelta(vec3.length(diff), 0.0))) return null;
 
-  var denom;
-
-  if(ux*vy - vx*uy !== 0) { // solve for x and y coordinates
-      denom = ux*vy - vx*uy;
-      s = (bx*vy - vx*by)/(denom);
-      t = (ux*by - bx*uy)/(denom);
-      return [s, t];
-  } else if (ux*vz - vx*uz !== 0) { // solve for x and z coordinates
-      denom = ux*vz - vx*uz;
-      s = (bx*vz - vx*bz)/(denom);
-      t = (ux*bz - bx*uz)/(denom);
-      return [s, t];
-  } else if (uy*vz - vy*uz !== 0) { // solve for y and z coordinates
-      denom = uy*vz - vy*uz;
-      s = (by*vz - vy*bz)/(denom);
-      t = (uy*bz - by*uz)/(denom);
-      return [s, t];
-  } else 
-      return null; // lines are parallel or coincide
+  var denom = a1*b2 - b1*a2;
+  s = (c1*b2 - b1*c2)/(denom);
+  t = (a1*c2 - c1*a2)/(denom);
+  return [s, t];
 }
 
 export function getLineIntersection(a, b, c, d) {
@@ -157,7 +151,7 @@ export function getLineIntersection(a, b, c, d) {
   s = solveParametricIntersection(a, ab, c, cd);
   if (!s) return null; 
 
-  vec3.scale(n, ab, s[0]);
+  vec3.scale(n, ab, s[1]);
   vec3.add(p, a, n);
 
   return p;
@@ -169,7 +163,7 @@ export function getLineIntersection(a, b, c, d) {
 //Inputs: a (vec3), b (vec3), c (vec3)
 //Returns: On object of the form {circumcenter: vec3, R: float (radius)}
 export function getTriangleCircumcenter(A, B, C) {
-  var a = vec3.create(0), b = vec3.create(),
+  var a = vec3.create(), b = vec3.create(),
       _a_2,
       _b_2,
       _axb_2,

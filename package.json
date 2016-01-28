@@ -18,9 +18,15 @@
     "test": "faucet `find test -name '*-test.js'`",
     "prepublish": "npm run test && uglifyjs build/gl-geom.js -c -m -o build/gl-geom.min.js && rm -f build/gl-geom.zip && zip -j build/gl-geom.zip -- LICENSE README.md build/gl-geom.js build/gl-geom.min.js"
   },
+  "dependencies": {
+    "gl-matrix": "2.3.1",
+    "d3": "3.5.6"
+  },
   "devDependencies": {
     "faucet": "0.0",
     "rollup": "0.20.5",
+    "rollup-plugin-commonjs": "^2.2.0",
+    "rollup-plugin-npm": "^1.3.0",
     "tape": "4",
     "uglify-js": "2"
   }

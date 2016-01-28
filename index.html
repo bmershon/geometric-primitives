@@ -1,19 +1,20 @@
 <html>
 <head>
 <!-- This is how you include external scripts in Javascript !-->
-<script src = "build/gl-geom.js"></script>
 <script src= "gl-matrix-min.js"></script>
+<script src = "build/gl-geom.js"></script>
 <script src = "plotly.min.js"></script>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <body>
-
 <div id = "viz"></div>
-
 <script>
 
 "use strict";
-var gl = {};
-gl.geom = gl_geom;
+
+// expose module properties to global namespace
+for (var property in gl_geom) {
+  window[property] = gl_geom[property];
+}
 
 var data = [];
 
@@ -49,7 +50,7 @@ for(var i = 0; i < vertices.length; i++){
 for(var i = 0; i < faces.length; i++) {
   let face = faces[i];
   let points = face.map(function(d) { return vertices[d];});
-  let c = gl.geom.getTriangleCircumcenter.apply(null, points).Circumcenter;
+  let c = getTriangleCircumcenter.apply(null, points).Circumcenter;
   data.push({
     x: [c[0]], y: [c[1]], z: [c[2]],
     mode: 'markers+lines', line: {color: '#ffffff', width: 10},
@@ -93,7 +94,7 @@ for (var i = 0; i < edges.length; i++) {
   });
 }
 
-var ball = gl.geom.getTetrahedronCircumsphere.apply(null, vertices);
+var ball = getTetrahedronCircumsphere.apply(null, vertices);
 var radius = ball.Radius;
 var center = ball.Circumcenter;
 
@@ -158,7 +159,7 @@ function getMousePos(canvas, evt) {
 }
 
 Plotly.newPlot('viz', data, layout);  
-</script>
 
+</script>
 </body>
 </html>
