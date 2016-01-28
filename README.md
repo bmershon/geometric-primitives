@@ -37,10 +37,10 @@ npm install
 To run all tests and build the *GeomPrimitives file from source*:
 
 ```
-npm submit
+npm run submit
 ```
 
-This runs command does a few things. First, it compiles the code in the *src/* folder into a module that works in Node as well as in the Browser. This file resides in *build/*.
+This runs a script specified in *package.json* that does a few things. First, it compiles the code in the *src/* folder into a module that works in a Node.js environment as well as in the browser. This file resides in *build/*.
 
 Because this assignment expects a file called *GeoPrimitives.js*, which exposes the main functions to the global namespace when the file is included as a script in the browswer, npm submit creates *GeomPrimitives.js* by concatenating *build/gl-geom.js* and the following snippet:
 
@@ -52,4 +52,4 @@ for (var property in gl_geom) {
 }
 ```
 
-This build pattern closely adheres to a module pattern propsed by Mike Bostock for plugins to the D3 data visualizaiton library.
+This build pattern closely adheres to a module pattern propsed by Mike Bostock for plugins to the D3 data visualizaiton library. Why go through all the trouble? For future assignments, I hope to keep things modular and develop plugins in the style of D3 plugins. This is a test run.
