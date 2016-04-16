@@ -10,6 +10,8 @@ Instructor: Chris Tralie
 
 Student: Brooks Mershon
 
+<img src="img/circumsphere.png" width="100%">
+
 ## Quickstart
 
 Open *index.html* to see the circumsphere of a tetrahedron.
